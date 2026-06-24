@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import Ritual from "./pages/Ritual";
 import About from "./pages/About";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/shop" element={<Shop />} />
             <Route path="/ritual" element={<Ritual />} />
             <Route path="/about" element={<About />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

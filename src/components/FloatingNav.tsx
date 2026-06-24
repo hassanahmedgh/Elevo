@@ -29,6 +29,7 @@ const FloatingNav: React.FC = () => {
     { label: "Shop", to: "/shop" },
     { label: "Ritual", to: "/ritual" },
     { label: "About", to: "/about" },
+    { label: "Admin", to: "/admin" },
   ];
 
   return (
