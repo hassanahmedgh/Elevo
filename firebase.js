@@ -14,16 +14,20 @@ import {
   doc, setDoc, updateDoc, deleteDoc, addDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
+// Config is inlined so the site works on any static host (Vercel / GitHub
+// Pages) with no build step. window.__ENV (env.js) overrides it if present.
+// A Firebase *web* config is public by design — data is protected by the
+// Firestore security rules, not by hiding this key.
 const env = window.__ENV || {};
 
 const firebaseConfig = {
-  apiKey: env.FIREBASE_API_KEY,
-  authDomain: env.FIREBASE_AUTH_DOMAIN,
-  projectId: env.FIREBASE_PROJECT_ID,
-  storageBucket: env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: env.FIREBASE_APP_ID,
-  measurementId: env.FIREBASE_MEASUREMENT_ID
+  apiKey: env.FIREBASE_API_KEY || "AIzaSyDoz4ERv2uxQFF7d6NCWXaFOryinJHjP18",
+  authDomain: env.FIREBASE_AUTH_DOMAIN || "elevo-44e6c.firebaseapp.com",
+  projectId: env.FIREBASE_PROJECT_ID || "elevo-44e6c",
+  storageBucket: env.FIREBASE_STORAGE_BUCKET || "elevo-44e6c.firebasestorage.app",
+  messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID || "674701518736",
+  appId: env.FIREBASE_APP_ID || "1:674701518736:web:a1a10d49b482418f7e7515",
+  measurementId: env.FIREBASE_MEASUREMENT_ID || "G-8LX36VWZ8D"
 };
 
 const app = initializeApp(firebaseConfig);

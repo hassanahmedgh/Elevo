@@ -1467,15 +1467,19 @@ function renderAdminTab() {
   }
 }
 
+function orderTotal(o) { return parseFloat(String(o.total).replace(/[$,]/g, '')) || 0; }
+
 function renderDashboard() {
-  const totalRev = ORDERS.filter(o => o.status !== 'cancelled').reduce((s, o) => s + parseFloat(o.total.replace('$', '')), 0);
+  const liveOrders = ORDERS.filter(o => o.status !== 'cancelled');
+  const totalRev = liveOrders.reduce((s, o) => s + orderTotal(o), 0);
+  const avgOrder = liveOrders.length ? totalRev / liveOrders.length : 0;
   return `
     <div class="stats-grid">
       ${[
-      { label: 'Total Revenue', value: `$${totalRev.toLocaleString('en', { minimumFractionDigits: 2 })}`, change: '+12.5% vs last month', dir: 'up', icon: '💰', cls: 'green' },
-      { label: 'Total Orders', value: '1,284', change: '+8.2% vs last month', dir: 'up', icon: '📦', cls: 'blue' },
+      { label: 'Total Revenue', value: `$${totalRev.toLocaleString('en', { minimumFractionDigits: 2 })}`, change: `$${avgOrder.toFixed(2)} avg order`, dir: 'up', icon: '💰', cls: 'green' },
+      { label: 'Total Orders', value: ORDERS.length.toLocaleString(), change: `${liveOrders.length} active`, dir: 'up', icon: '📦', cls: 'blue' },
       { label: 'Products', value: adminProducts.length, change: `${adminProducts.filter(p => p.inStock).length} in stock`, dir: 'up', icon: '🏷️', cls: 'yellow' },
-      { label: 'Customers', value: '3,842', change: '+23 this week', dir: 'up', icon: '👥', cls: 'red' },
+      { label: 'Customers', value: CUSTOMERS.length.toLocaleString(), change: `${CUSTOMERS.filter(c => c.status === 'active').length} active`, dir: 'up', icon: '👥', cls: 'red' },
     ].map(s => `
         <div class="stat-card">
           <div class="stat-icon ${s.cls}">${s.icon}</div>
@@ -1656,8 +1660,11 @@ function renderAdminOrders() {
   return `
     <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:1.5rem">
       ${[
-      ['Total Orders', '1,284', 'blue', '📦'], ['Pending', '24', 'yellow', '⏳'],
-      ['Processing', '38', 'blue', '⚙️'], ['Delivered', '1,186', 'green', '✅'], ['Cancelled', '12', 'red', '❌'],
+      ['Total Orders', ORDERS.length, 'blue', '📦'],
+      ['Pending', ORDERS.filter(o => o.status === 'pending').length, 'yellow', '⏳'],
+      ['Processing', ORDERS.filter(o => o.status === 'processing').length, 'blue', '⚙️'],
+      ['Delivered', ORDERS.filter(o => o.status === 'delivered').length, 'green', '✅'],
+      ['Cancelled', ORDERS.filter(o => o.status === 'cancelled').length, 'red', '❌'],
     ].map(([l, v, c, i]) => `<div class="stat-card"><div class="stat-icon ${c}">${i}</div><div><div class="stat-label">${l}</div><div class="stat-value" style="font-size:1.3rem">${v}</div></div></div>`).join('')}
     </div>
     <div class="admin-table-wrap">
@@ -1738,7 +1745,10 @@ function renderAdminCustomers() {
 
 function renderAnalytics() {
   const categories = ['Electronics', 'Audio', 'Wearables', 'Accessories'];
-  const sales = [42, 28, 18, 12];
+  // Share of sales by category, derived from each category's review volume.
+  const byCat = categories.map(c => PRODUCTS.filter(p => p.category === c).reduce((s, p) => s + (p.reviews || 0), 0));
+  const totalReviews = byCat.reduce((s, n) => s + n, 0) || 1;
+  const sales = byCat.map(n => Math.round((n / totalReviews) * 100));
   return `
     <div class="stats-grid">
       ${[
@@ -2957,24 +2967,61 @@ function unlockScroll() {
 }
 
 /* ─────────────────────────────────────────────
+   COOKIE CONSENT
+───────────────────────────────────────────── */
+const CookieService = {
+  set(name, value, days = 365) {
+    const d = new Date();
+    d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+  },
+  get(name) {
+    return document.cookie.split('; ').reduce((r, c) => {
+      const [k, ...v] = c.split('=');
+      return k === name ? decodeURIComponent(v.join('=')) : r;
+    }, '');
+  }
+};
+
+function initCookieConsent() {
+  if (CookieService.get('elevo_consent')) return;   // already chosen
+  const bar = document.createElement('div');
+  bar.className = 'cookie-banner';
+  bar.innerHTML = `
+    <div class="cookie-icon">🍪</div>
+    <div class="cookie-body">
+      <div class="cookie-text">
+        <strong>We value your privacy</strong>
+        <p>We use cookies to enhance your browsing experience, analyse traffic and personalise content. By clicking “Accept”, you consent to our use of cookies. Read our <a onclick="navigate('privacy');dismissCookieBanner()">Privacy Policy</a>.</p>
+      </div>
+      <div class="cookie-actions">
+        <button class="btn btn-secondary btn-sm" onclick="setCookieConsent('declined')">Decline</button>
+        <button class="btn btn-primary btn-sm" onclick="setCookieConsent('accepted')">Accept</button>
+      </div>
+    </div>`;
+  document.body.appendChild(bar);
+  requestAnimationFrame(() => bar.classList.add('show'));
+}
+
+function setCookieConsent(choice) {
+  CookieService.set('elevo_consent', choice);
+  if (choice === 'accepted') CookieService.set('elevo_session', 'sess_' + Math.random().toString(36).slice(2));
+  Toast.show(choice === 'accepted' ? 'Cookies accepted — thanks!' : 'Only essential cookies will be used.', choice === 'accepted' ? 'success' : 'info');
+  dismissCookieBanner();
+}
+
+function dismissCookieBanner() {
+  const b = document.querySelector('.cookie-banner');
+  if (b) { b.classList.remove('show'); setTimeout(() => b.remove(), 300); }
+}
+
+/* ─────────────────────────────────────────────
    INIT
 ───────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
   CartService.updateBadge();
   renderAccountMenu();
-
-  // Wait for the Firebase module (firebase.js) to finish initialising, then
-  // pull live data from Firestore before the first render. Falls back to seed
-  // data after a short timeout if Firebase never becomes available.
-  if (!window.FB) {
-    await new Promise(resolve => {
-      let settled = false;
-      const done = () => { if (!settled) { settled = true; resolve(); } };
-      window.addEventListener('firebase-ready', done, { once: true });
-      setTimeout(done, 3000);
-    });
-  }
-  await DataService.loadAll();
+  initCookieConsent();
 
   // Handle hash routing — only fires for #/ prefixed routes, never for anchor fragments
   function routeFromHash() {
@@ -2985,5 +3032,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     Router.go(validRoutes.includes(route) ? route : 'home');
   }
   window.addEventListener('hashchange', routeFromHash);
+
+  // 1) Render immediately with bundled seed data — never show a blank page.
   routeFromHash();
+
+  // 2) Then connect to Firestore and re-render the current view with live data.
+  hydrateFromFirebase();
 });
+
+async function hydrateFromFirebase() {
+  // Give firebase.js (a deferred module) a moment to set up window.FB.
+  if (!window.FB) {
+    await new Promise(resolve => {
+      let settled = false;
+      const done = () => { if (!settled) { settled = true; resolve(); } };
+      window.addEventListener('firebase-ready', done, { once: true });
+      setTimeout(done, 4000);
+    });
+  }
+  if (!window.FB) { console.warn('[Elevo] Firebase never initialised — staying on seed data.'); return; }
+  await DataService.loadAll();
+  if (DataService.ready) Router.go(Router.current);   // refresh view with live data
+}
