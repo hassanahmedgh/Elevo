@@ -121,9 +121,9 @@ const Home: React.FC = () => {
             className="font-syne font-bold leading-none"
             style={{
               color: "#393f38",
-              fontSize: "clamp(3.5rem, 10vw, 9rem)",
+              fontSize: "clamp(3rem, 8vw, 7.5rem)",
               letterSpacing: "-0.03em",
-              maxWidth: "65vw",
+              maxWidth: "min(92vw, 600px)",
             }}
           >
             Live <br />
@@ -137,7 +137,7 @@ const Home: React.FC = () => {
           >
             Precision botanicals for the way you actually live. Clean, intentional, uncommonly effective.
           </p>
-          <div className="flex items-center gap-4 mt-8">
+          <div className="flex items-center gap-4 mt-8 pointer-events-auto">
             <Link
               to="/shop"
               className="flex items-center gap-2 px-7 py-3.5 rounded-full font-syne font-semibold text-sm magnetic-btn group"
@@ -156,9 +156,9 @@ const Home: React.FC = () => {
           </div>
         </div>
 
-        {/* Fixed central product — stays in place */}
+        {/* Product image — right half on desktop so it never covers the headline */}
         <div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          className="absolute inset-y-0 right-0 w-full md:w-1/2 flex items-center justify-center pointer-events-none"
           style={{ zIndex: 2 }}
         >
           <div

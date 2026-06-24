@@ -29,7 +29,6 @@ const FloatingNav: React.FC = () => {
     { label: "Shop", to: "/shop" },
     { label: "Ritual", to: "/ritual" },
     { label: "About", to: "/about" },
-    { label: "Admin", to: "/admin" },
   ];
 
   return (
@@ -55,7 +54,7 @@ const FloatingNav: React.FC = () => {
             className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold font-syne"
             style={{ background: "#d1f569", color: "#393f38" }}
           >
-            V
+            E
           </div>
           <span className="font-syne font-700 text-sm hidden sm:block" style={{ color: "#393f38", fontWeight: 700 }}>
             Elevo
@@ -84,6 +83,18 @@ const FloatingNav: React.FC = () => {
             </Link>
           );
         })}
+
+        {/* Admin button */}
+        <Link
+          to="/admin"
+          className="ml-1 px-4 py-1.5 rounded-full text-sm font-jakarta font-semibold transition-all duration-300 hover:opacity-90 hidden sm:block"
+          style={{
+            background: location.pathname === "/admin" ? "#d1f569" : "#393f38",
+            color: location.pathname === "/admin" ? "#393f38" : "#fdfdfd",
+          }}
+        >
+          Admin
+        </Link>
 
         {/* Cart */}
         <button

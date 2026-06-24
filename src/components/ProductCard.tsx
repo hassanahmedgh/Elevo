@@ -21,7 +21,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, staggerIndex = 0, onExpand, inView = true }) => {
-  const { addItem, openCart } = useCart();
+  const { addItem } = useCart();
   const cardRef = useRef<HTMLDivElement>(null);
   const [flyActive, setFlyActive] = useState(false);
   const [magnetPos, setMagnetPos] = useState({ x: 0, y: 0 });
@@ -65,7 +65,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, staggerIndex = 0, on
         img_url: product.img_url,
         variant: product.variant,
       });
-      openCart();
+      // Note: intentionally NOT opening the cart — it only opens via the bag icon.
     }, 600);
   };
 
