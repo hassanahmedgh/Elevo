@@ -919,8 +919,8 @@ function setCategory(cat) {
 }
 function setViewMode(mode) {
   shopState.viewMode = mode;
-  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+  document.querySelectorAll('.view-btn').forEach(b =>
+    b.classList.toggle('active', (b.getAttribute('onclick') || '').includes(`'${mode}'`)));
   refreshShopProducts();
 }
 function clearFilters() {
@@ -1422,6 +1422,16 @@ let editingId = null;
 
 function renderAdmin() {
   const root = document.querySelector('.view');
+  const live = (typeof DataService !== 'undefined' && DataService.ready);
+  const statusBadge = live
+    ? `<span style="padding:.35rem .85rem;background:rgba(16,185,129,.15);color:#34d399;border-radius:999px;font-size:.75rem;font-weight:700">● Firestore connected</span>`
+    : `<span style="padding:.35rem .85rem;background:rgba(245,158,11,.15);color:#fbbf24;border-radius:999px;font-size:.75rem;font-weight:700">● Demo data — not saving</span>`;
+  const offlineBanner = live ? '' : `
+    <div style="background:#fef3c7;border:1px solid #fde68a;color:#92400e;border-radius:var(--radius);padding:.85rem 1.1rem;margin-bottom:1.25rem;font-size:.85rem;line-height:1.5">
+      <strong>⚠️ Not connected to Firestore.</strong> Changes here won't be saved. Your database rejected access
+      (<code>permission-denied</code>). Open <strong>Firebase Console → Firestore → Rules</strong>, publish the rules from
+      <code>firestore.rules</code>, then reload this page.
+    </div>`;
   root.innerHTML = `
     <div style="background:var(--dark);padding:1.25rem 0;border-bottom:1px solid rgba(255,255,255,.08)">
       <div class="container">
@@ -1431,13 +1441,14 @@ function renderAdmin() {
             <div style="color:#fff;font-weight:800;font-size:1.3rem">Elevo Dashboard</div>
           </div>
           <div style="display:flex;gap:.75rem;align-items:center">
-            <span style="padding:.35rem .85rem;background:rgba(16,185,129,.15);color:#34d399;border-radius:999px;font-size:.75rem;font-weight:700">● Live</span>
+            ${statusBadge}
             <button class="btn btn-secondary btn-sm" onclick="navigate('home')" style="border-color:rgba(255,255,255,.2);color:#94a3b8">← Back to Store</button>
           </div>
         </div>
       </div>
     </div>
     <div class="container admin-page">
+      ${offlineBanner}
       <div class="admin-tabs">
         ${[['dashboard', '📊 Dashboard'], ['products', '📦 Products'], ['orders', '🛒 Orders'], ['customers', '👥 Customers'], ['analytics', '📈 Analytics']].map(([key, label]) =>
     `<button class="admin-tab ${adminTab === key ? 'active' : ''}" onclick="switchAdminTab('${key}')">${label}</button>`
@@ -1450,8 +1461,8 @@ function renderAdmin() {
 
 function switchAdminTab(tab) {
   adminTab = tab;
-  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+  document.querySelectorAll('.admin-tab').forEach(t =>
+    t.classList.toggle('active', (t.getAttribute('onclick') || '').includes(`'${tab}'`)));
   renderAdminTab();
 }
 

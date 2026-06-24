@@ -303,33 +303,38 @@ ul {
   position: relative;
 }
 .nav-dropdown {
-  display: none;
+  opacity: 0;
+  visibility: hidden;
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 6px);
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(-6px);
   width: 560px;
   background: var(--white);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
   z-index: 1000;
-  animation: dropdown-in .18s ease;
   overflow: hidden;
+  /* fade/slide with a grace period before hiding so the cursor can reach it */
+  transition: opacity .18s ease, transform .18s ease, visibility .18s;
+  transition-delay: .25s;
 }
-@keyframes dropdown-in {
-  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-/* tiny bridge so the cursor can travel from button → dropdown */
+/* generous invisible bridge spanning the gap between button and panel */
 .nav-dropdown::before {
   content: '';
   position: absolute;
-  top: -12px;
+  top: -16px;
   left: 0; right: 0;
-  height: 12px;
+  height: 16px;
 }
-.nav-dropdown-wrap:hover .nav-dropdown { display: block; }
+.nav-dropdown-wrap:hover .nav-dropdown,
+.nav-dropdown:hover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition-delay: 0s;   /* appears instantly on hover, no hide-delay while inside */
+}
 
 .nav-dropdown-inner {
   display: grid;
