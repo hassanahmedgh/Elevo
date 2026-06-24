@@ -8,7 +8,7 @@
 /* ─────────────────────────────────────────────
    DATA STORE
 ───────────────────────────────────────────── */
-const PRODUCTS = [
+const SEED_PRODUCTS = [
   {
     id: 1, name: 'ProSound ANC Headphones', category: 'Audio',
     price: 249.99, originalPrice: 329.99, rating: 4.8, reviews: 1284,
@@ -131,15 +131,22 @@ const PRODUCTS = [
   }
 ];
 
-const CATEGORIES = [
-  { name: 'All', icon: '🛒', count: PRODUCTS.length },
-  { name: 'Electronics', icon: '💻', count: PRODUCTS.filter(p => p.category === 'Electronics').length },
-  { name: 'Audio', icon: '🎧', count: PRODUCTS.filter(p => p.category === 'Audio').length },
-  { name: 'Wearables', icon: '⌚', count: PRODUCTS.filter(p => p.category === 'Wearables').length },
-  { name: 'Accessories', icon: '🔌', count: PRODUCTS.filter(p => p.category === 'Accessories').length }
-];
+/* These three arrays start from the bundled seed data and are replaced at
+   runtime by DataService.loadAll() with live documents from Firestore. */
+let PRODUCTS = [...SEED_PRODUCTS];
 
-const ORDERS = [
+function buildCategories() {
+  return [
+    { name: 'All', icon: '🛒', count: PRODUCTS.length },
+    { name: 'Electronics', icon: '💻', count: PRODUCTS.filter(p => p.category === 'Electronics').length },
+    { name: 'Audio', icon: '🎧', count: PRODUCTS.filter(p => p.category === 'Audio').length },
+    { name: 'Wearables', icon: '⌚', count: PRODUCTS.filter(p => p.category === 'Wearables').length },
+    { name: 'Accessories', icon: '🔌', count: PRODUCTS.filter(p => p.category === 'Accessories').length }
+  ];
+}
+let CATEGORIES = buildCategories();
+
+const SEED_ORDERS = [
   { id: '#ORD-8821', customer: 'Alex Johnson', date: '2026-04-04', total: '$419.98', status: 'delivered', items: 2 },
   { id: '#ORD-8820', customer: 'Maria Garcia', date: '2026-04-04', total: '$149.99', status: 'shipped', items: 1 },
   { id: '#ORD-8819', customer: 'James Wilson', date: '2026-04-03', total: '$729.97', status: 'processing', items: 3 },
@@ -147,8 +154,9 @@ const ORDERS = [
   { id: '#ORD-8817', customer: 'Mike Thompson', date: '2026-04-02', total: '$979.97', status: 'delivered', items: 4 },
   { id: '#ORD-8816', customer: 'Emma Davis', date: '2026-04-02', total: '$189.99', status: 'cancelled', items: 1 },
 ];
+let ORDERS = [...SEED_ORDERS];
 
-const CUSTOMERS = [
+const SEED_CUSTOMERS = [
   { id: 'C001', name: 'Alex Johnson', email: 'alex@example.com', orders: 8, spent: '$1,842', status: 'active', joined: '2024-01' },
   { id: 'C002', name: 'Maria Garcia', email: 'maria@example.com', orders: 3, spent: '$449.97', status: 'active', joined: '2025-03' },
   { id: 'C003', name: 'James Wilson', email: 'james@example.com', orders: 15, spent: '$3,219', status: 'active', joined: '2023-08' },
@@ -156,6 +164,55 @@ const CUSTOMERS = [
   { id: 'C005', name: 'Mike Thompson', email: 'mike@example.com', orders: 22, spent: '$6,104', status: 'active', joined: '2022-11' },
   { id: 'C006', name: 'Emma Davis', email: 'emma@example.com', orders: 5, spent: '$983', status: 'inactive', joined: '2024-06' },
 ];
+let CUSTOMERS = [...SEED_CUSTOMERS];
+
+/* ─────────────────────────────────────────────
+   FIREBASE DATA SERVICE
+   Pulls products / orders / customers from Firestore at startup.
+   • First run on an empty database → seeds it with the bundled data.
+   • Firebase missing or offline → silently falls back to seed data
+     so the storefront always renders.
+   window.FB is provided by firebase.js (loaded as a module).
+───────────────────────────────────────────── */
+const DataService = {
+  ready: false,
+  async loadAll() {
+    if (!window.FB) { console.warn('[Elevo] Firebase unavailable — using local seed data.'); return; }
+    try {
+      let products = await FB.getAll('products');
+      if (!products.length) { await FB.seed('products', SEED_PRODUCTS, 'id'); products = [...SEED_PRODUCTS]; }
+      PRODUCTS = products.map(normalizeProduct).sort((a, b) => a.id - b.id);
+
+      let orders = await FB.getAll('orders');
+      if (!orders.length) { await FB.seed('orders', SEED_ORDERS, 'id'); orders = [...SEED_ORDERS]; }
+      ORDERS = orders;
+
+      let customers = await FB.getAll('customers');
+      if (!customers.length) { await FB.seed('customers', SEED_CUSTOMERS, 'id'); customers = [...SEED_CUSTOMERS]; }
+      CUSTOMERS = customers;
+
+      CATEGORIES = buildCategories();
+      adminProducts = [...PRODUCTS];
+      this.ready = true;
+      console.log(`[Elevo] Firestore live: ${PRODUCTS.length} products · ${ORDERS.length} orders · ${CUSTOMERS.length} customers`);
+    } catch (e) {
+      console.warn('[Elevo] Firestore read failed — using local seed data.', e);
+    }
+  }
+};
+
+// Firestore returns plain objects — guarantee the shape the UI expects.
+function normalizeProduct(p) {
+  return {
+    ...p,
+    id: typeof p.id === 'number' ? p.id : Number(p.id),
+    colors: p.colors || ['#1e293b'],
+    features: p.features || [],
+    tags: p.tags || [],
+    svgIcon: p.svgIcon || 'monitor',
+    svgColor: p.svgColor || '#3b82f6'
+  };
+}
 
 /* ─────────────────────────────────────────────
    SVG PRODUCT ILLUSTRATION GENERATOR
@@ -658,6 +715,8 @@ function renderHome() {
 
 function handleNewsletter(e) {
   e.preventDefault();
+  const email = e.target.querySelector('input')?.value || '';
+  if (window.FB) FB.add('newsletter', { email }).catch(() => {});
   Toast.show('You\'re subscribed! Check your inbox for a welcome gift.', 'success', 4000);
   e.target.reset();
 }
@@ -1565,20 +1624,30 @@ function saveProduct() {
   const inStock = document.getElementById('pf-stock').value === 'true';
   const badge = document.getElementById('pf-badge').value || null;
   if (!name || !price) { Toast.show('Name and price are required.', 'error'); return; }
+  let prod;
   if (editingId) {
     const idx = adminProducts.findIndex(p => p.id === editingId);
-    adminProducts[idx] = { ...adminProducts[idx], name, category: cat, price, originalPrice: orig, description: desc, inStock, badge };
+    prod = { ...adminProducts[idx], name, category: cat, price, originalPrice: orig, description: desc, inStock, badge };
+    adminProducts[idx] = prod;
     Toast.show('Product updated!', 'success');
   } else {
-    const newId = Math.max(...adminProducts.map(p => p.id)) + 1;
-    adminProducts.push({ id: newId, name, category: cat, price, originalPrice: orig, description: desc, inStock, badge, rating: 4.5, reviews: 0, featured: false, colors: ['#1e293b'], features: [], tags: [], svgColor: '#3b82f6', svgIcon: 'monitor' });
+    const newId = (adminProducts.length ? Math.max(...adminProducts.map(p => p.id)) : 0) + 1;
+    prod = { id: newId, name, category: cat, price, originalPrice: orig, description: desc, inStock, badge, rating: 4.5, reviews: 0, featured: false, colors: ['#1e293b'], features: [], tags: [], svgColor: '#3b82f6', svgIcon: 'monitor' };
+    adminProducts.push(prod);
     Toast.show('Product added!', 'success');
   }
+  // Keep the storefront in sync and persist to Firestore
+  PRODUCTS = [...adminProducts];
+  CATEGORIES = buildCategories();
+  if (window.FB) FB.set('products', prod.id, prod).catch(() => Toast.show('Cloud save failed — saved locally only.', 'error'));
   document.getElementById('admin-product-form-area').innerHTML = '';
   document.getElementById('admin-products-body').innerHTML = renderProductRows(adminProducts);
 }
 function deleteProduct(id) {
   adminProducts = adminProducts.filter(p => p.id !== id);
+  PRODUCTS = [...adminProducts];
+  CATEGORIES = buildCategories();
+  if (window.FB) FB.remove('products', id).catch(() => Toast.show('Cloud delete failed.', 'error'));
   Toast.show('Product deleted.', 'warning');
   document.getElementById('admin-products-body').innerHTML = renderProductRows(adminProducts);
 }
@@ -1626,6 +1695,9 @@ function renderAdminOrders() {
     </div>`;
 }
 function updateOrderStatus(id, status) {
+  const o = ORDERS.find(x => x.id === id);
+  if (o) o.status = status;
+  if (window.FB) FB.update('orders', id, { status }).catch(() => Toast.show('Cloud update failed.', 'error'));
   Toast.show(`Order ${id} marked as ${status}`, 'success');
 }
 
@@ -2728,6 +2800,13 @@ function renderContact() {
 }
 
 function submitContact() {
+  // Collect whatever the user typed into the contact form and store it
+  const root = document.querySelector('.view');
+  const inputs = root ? root.querySelectorAll('input, select, textarea') : [];
+  const [firstName, lastName, email, orderId] = [...inputs].map(i => i.value);
+  const subject = root?.querySelector('select')?.value || '';
+  const message = root?.querySelector('textarea')?.value || '';
+  if (window.FB) FB.add('messages', { firstName, lastName, email, orderId, subject, message }).catch(() => {});
   Toast.show('Message sent! We\'ll get back to you within 2 hours.', 'success', 4000);
 }
 
@@ -2880,9 +2959,22 @@ function unlockScroll() {
 /* ─────────────────────────────────────────────
    INIT
 ───────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   CartService.updateBadge();
   renderAccountMenu();
+
+  // Wait for the Firebase module (firebase.js) to finish initialising, then
+  // pull live data from Firestore before the first render. Falls back to seed
+  // data after a short timeout if Firebase never becomes available.
+  if (!window.FB) {
+    await new Promise(resolve => {
+      let settled = false;
+      const done = () => { if (!settled) { settled = true; resolve(); } };
+      window.addEventListener('firebase-ready', done, { once: true });
+      setTimeout(done, 3000);
+    });
+  }
+  await DataService.loadAll();
 
   // Handle hash routing — only fires for #/ prefixed routes, never for anchor fragments
   function routeFromHash() {

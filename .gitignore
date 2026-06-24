@@ -1,0 +1,10 @@
+# Local environment file (real values live in env.js for the static deploy)
+.env
+
+# Dependencies / build output (in case the project gains a build step later)
+node_modules/
+dist/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db

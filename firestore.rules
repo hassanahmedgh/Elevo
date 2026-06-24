@@ -1,0 +1,37 @@
+rules_version = '2';
+
+// ─────────────────────────────────────────────────────────────
+// Elevo Firestore security rules — DEMO configuration.
+//
+// The store currently has no real authentication, so the admin panel
+// writes directly from the browser. These rules allow that for the demo:
+//   • products / orders / customers : public read + write
+//   • newsletter / messages         : public create only (form submissions)
+//
+// ⚠️ Before going to production, lock writes behind Firebase Auth, e.g.:
+//      allow write: if request.auth != null && request.auth.token.admin == true;
+// ─────────────────────────────────────────────────────────────
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /products/{id} {
+      allow read, write: if true;
+    }
+    match /orders/{id} {
+      allow read, write: if true;
+    }
+    match /customers/{id} {
+      allow read, write: if true;
+    }
+
+    // Public forms — anyone can submit, nobody can read back from the client.
+    match /newsletter/{id} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+    match /messages/{id} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+  }
+}
