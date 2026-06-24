@@ -20,12 +20,12 @@ const values = [
   {
     number: "03",
     title: "Ritual Over Routine",
-    desc: "We design products that reward slow use. Our formats are intentional — never convenient for its own sake.",
+    desc: "We design products that reward slow use. Our formats are intentional, never convenient for its own sake.",
   },
   {
     number: "04",
     title: "Carbon Transparency",
-    desc: "We measure every gram of CO₂ in our supply chain, publish it annually, and act to reduce — not offset — our footprint.",
+    desc: "We measure every gram of CO₂ in our supply chain, publish it annually, and act to reduce, not offset, our footprint.",
   },
 ];
 
@@ -103,20 +103,20 @@ const About: React.FC = () => {
                 <p className="font-syne font-semibold text-sm" style={{ color: "#393f38" }}>
                   "I was tired of complexity masquerading as science. The best formulas are honest ones."
                 </p>
-                <p className="font-jakarta text-xs mt-2" style={{ color: "#9da391" }}>— Saoirse Mbeki, Founder</p>
+                <p className="font-jakarta text-xs mt-2" style={{ color: "#9da391" }}>Saoirse Mbeki, Founder</p>
               </div>
             </div>
           </div>
 
           <div className="pt-4">
             <p className="font-jakarta text-base leading-relaxed mb-6" style={{ color: "#393f38", opacity: 0.8, lineHeight: 1.85 }}>
-              Elevo started as a personal project — a notebook filled with plant research, a weekend formulation practice, and a growing frustration with wellness brands that seemed to care more about packaging than plants.
+              Elevo started as a personal project, a notebook filled with plant research, a weekend formulation practice, and a growing frustration with wellness brands that seemed to care more about packaging than plants.
             </p>
             <p className="font-jakarta text-base leading-relaxed mb-6" style={{ color: "#393f38", opacity: 0.8, lineHeight: 1.85 }}>
               In 2021, after three years of research partnerships with European bioregional farms and three rounds of clinical testing, we launched four products. We haven't rushed since.
             </p>
             <p className="font-jakarta text-base leading-relaxed mb-10" style={{ color: "#393f38", opacity: 0.8, lineHeight: 1.85 }}>
-              Every product is made in batches of 500. Every batch is tested before it ships. And every formula is designed to earn a place in your life — not just your bathroom cabinet.
+              Every product is made in batches of 500. Every batch is tested before it ships. And every formula is designed to earn a place in your life, not just your bathroom cabinet.
             </p>
 
             {/* Stats */}

@@ -114,7 +114,7 @@ const Admin: React.FC = () => {
             className="px-3 py-1.5 rounded-full text-xs font-semibold"
             style={live ? { background: "rgba(16,185,129,0.12)", color: "#047857" } : { background: "rgba(245,158,11,0.14)", color: "#b45309" }}
           >
-            ● {live ? "Firestore connected" : "Demo data — not saving"}
+            ● {live ? "Firestore connected" : "Demo data, not saving"}
           </span>
         </header>
 
@@ -223,9 +223,9 @@ const Products: React.FC<{ products: Product[]; onAdd: () => void; onEdit: (p: P
               <span className="font-medium" style={{ color: FOREST }}>{p.name}</span>
             </div>
           </Td>
-          <Td>{p.variant || "—"}</Td>
+          <Td>{p.variant || "-"}</Td>
           <Td><span className="font-semibold">{money(p.price)}</span></Td>
-          <Td>{p.tag ? <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: LIME, color: FOREST }}>{p.tag}</span> : <span style={{ color: SAGE }}>—</span>}</Td>
+          <Td>{p.tag ? <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: LIME, color: FOREST }}>{p.tag}</span> : <span style={{ color: SAGE }}>-</span>}</Td>
           <Td>
             <div className="flex items-center gap-2 justify-end">
               <button onClick={() => onEdit(p)} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "rgba(57,63,56,0.06)", color: FOREST }}><Pencil size={15} /></button>

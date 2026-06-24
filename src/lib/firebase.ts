@@ -4,7 +4,7 @@ import { getAnalytics, isSupported } from "firebase/analytics";
 
 // Config is inlined so the site works on Vercel with no env setup. Vite env
 // vars (VITE_FIREBASE_*) override it when present. A Firebase web config is
-// public by design — data is protected by Firestore security rules.
+// public by design, data is protected by Firestore security rules.
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDoz4ERv2uxQFF7d6NCWXaFOryinJHjP18",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "elevo-44e6c.firebaseapp.com",

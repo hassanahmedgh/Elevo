@@ -106,7 +106,7 @@ const Home: React.FC = () => {
           />
         </div>
 
-        {/* Typography layer — scrolls behind */}
+        {/* Typography layer, scrolls behind */}
         <div
           className="absolute inset-0 flex flex-col items-start justify-center pl-8 md:pl-20 pointer-events-none"
           style={{ transform: `translateY(${scrollY * 0.3}px)` }}
@@ -156,7 +156,7 @@ const Home: React.FC = () => {
           </div>
         </div>
 
-        {/* Product image — right half on desktop so it never covers the headline */}
+        {/* Product image, right half on desktop so it never covers the headline */}
         <div
           className="absolute inset-y-0 right-0 w-full md:w-1/2 flex items-center justify-center pointer-events-none"
           style={{ zIndex: 2 }}
@@ -315,7 +315,7 @@ const Home: React.FC = () => {
               </div>
               <div className="max-w-xs">
                 <p className="font-jakarta text-sm leading-relaxed mb-6" style={{ color: "rgba(253,253,253,0.6)" }}>
-                  We believe that consistent, mindful practice — not shortcuts — creates lasting wellbeing. Every product we make serves a ritual, not a promise.
+                  We believe that consistent, mindful practice, not shortcuts, creates lasting wellbeing. Every product we make serves a ritual, not a promise.
                 </p>
                 <Link
                   to="/about"

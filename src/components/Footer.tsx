@@ -46,7 +46,7 @@ const Footer: React.FC = () => {
             Stay in Touch.
           </h2>
           <p className="font-jakarta text-base mb-10 max-w-md mx-auto" style={{ color: "#9da391", lineHeight: 1.7 }}>
-            Seasonal rituals, new arrivals, and quiet invitations — delivered when it matters.
+            Seasonal rituals, new arrivals, and quiet invitations, delivered when it matters.
           </p>
 
           {/* Email form */}

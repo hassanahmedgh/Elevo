@@ -7,7 +7,7 @@ export type { Product };
 
 const COL = "products";
 
-// Bundled catalogue — also used to seed Firestore on first run and as an
+// Bundled catalogue, also used to seed Firestore on first run and as an
 // offline fallback if the database can't be reached.
 export const SEED_PRODUCTS: Product[] = [
   { id: 1, name: "Clarity Serum", subtitle: "Brightening · 30ml", price: 68, tag: "New", img_url: "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_58face2f01_65fe00ea22b54e39.png", lifestyle_img_url: "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_a0c2dc2f23_9774243ad2840e3c.png", variant: "30ml" },
@@ -24,7 +24,7 @@ export const SEED_PRODUCTS: Product[] = [
 export async function fetchProducts(): Promise<Product[]> {
   const snap = await getDocs(collection(db, COL));
   if (snap.empty) {
-    // First run — seed the database with the bundled catalogue.
+    // First run, seed the database with the bundled catalogue.
     await Promise.all(SEED_PRODUCTS.map((p) => setDoc(doc(db, COL, String(p.id)), p)));
     return [...SEED_PRODUCTS];
   }
@@ -43,7 +43,7 @@ export function nextProductId(list: Product[]): number {
   return (list.length ? Math.max(...list.map((p) => p.id)) : 0) + 1;
 }
 
-/** Storefront hook — loads live products, falls back to seed data. */
+/** Storefront hook, loads live products, falls back to seed data. */
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
   const [loading, setLoading] = useState(true);
@@ -56,7 +56,7 @@ export function useProducts() {
       setProducts(p);
       setLive(true);
     } catch (e) {
-      console.warn("[Elevo] Firestore unavailable — using seed catalogue.", e);
+      console.warn("[Elevo] Firestore unavailable, using seed catalogue.", e);
       setLive(false);
     } finally {
       setLoading(false);

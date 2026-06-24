@@ -108,7 +108,7 @@ const ProductDetailOverlay: React.FC<ProductDetailOverlayProps> = ({ product, on
 
             <p className="font-jakarta text-sm leading-relaxed mb-6" style={{ color: "#393f38", opacity: 0.8 }}>
               A carefully formulated ritual essential, crafted from responsibly sourced botanicals. 
-              Pure in composition, intentional in effect — designed to integrate seamlessly into your daily wellness practice.
+              Pure in composition, intentional in effect, designed to integrate seamlessly into your daily wellness practice.
             </p>
 
             {/* Benefits */}

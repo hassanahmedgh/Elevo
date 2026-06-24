@@ -12,7 +12,7 @@ const ritualSteps = [
     label: "Dawn",
     icon: <Sun size={20} />,
     name: "Morning Activation",
-    desc: "Begin with our Green Elixir — a single daily dose of concentrated botanical adaptogens. Shake, pour, and pause for sixty seconds of stillness before the day begins.",
+    desc: "Begin with our Green Elixir, a single daily dose of concentrated botanical adaptogens. Shake, pour, and pause for sixty seconds of stillness before the day begins.",
     products: ["Green Elixir", "Clarity Serum"],
     img_url: "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_f87a12a4ba_125c8166f5a2f8b5.png",
   },
@@ -89,7 +89,7 @@ const Ritual: React.FC = () => {
             The Elevo Ritual
           </h1>
           <p className="font-jakarta text-base md:text-lg max-w-lg mx-auto leading-relaxed" style={{ color: "#9da391" }}>
-            Not a supplement. Not a skincare product. A practice — designed around the rhythm of your day and the wisdom of plants.
+            Not a supplement. Not a skincare product. A practice, designed around the rhythm of your day and the wisdom of plants.
           </p>
         </div>
 
@@ -141,7 +141,7 @@ const Ritual: React.FC = () => {
           onMouseEnter={() => setActiveStep(i)}
         >
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
-            {/* Image — alternates sides */}
+            {/* Image, alternates sides */}
             <div className={`${i % 2 === 1 ? "md:order-2" : ""} ${inView[i] ? "rise-in" : "opacity-0"}`}>
               <div
                 className="relative overflow-hidden rounded-3xl group"

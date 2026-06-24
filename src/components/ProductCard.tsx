@@ -65,7 +65,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, staggerIndex = 0, on
         img_url: product.img_url,
         variant: product.variant,
       });
-      // Note: intentionally NOT opening the cart — it only opens via the bag icon.
+      // Note: intentionally NOT opening the cart, it only opens via the bag icon.
     }, 600);
   };
 
